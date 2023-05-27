@@ -4,7 +4,7 @@
 
 body {
   margin: 0;
-  background: darkblue;
+  background: #535389;
 }
 
 .main {
@@ -18,14 +18,14 @@ body {
 .cell {
   width: 30px;
   height: 30px;
-  border: 1px solid silver;
+  border: 1px solid #a2a289;
   display: inline-block;
 }
 
 .movingCell {
-  background-color: bisque;
+  background-color: #c0c490;
 }
 
 .fixedCell {
-  background-color: blueviolet;
+  background-color: #b3bb3b;
 }
