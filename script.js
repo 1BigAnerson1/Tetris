@@ -1,4 +1,6 @@
 let main = document.querySelector(".main");
+const scroeElem = document.getElementById("score");
+const levelElem = document.getElementById("level");
 
 let playfield = [
     [0,0,0,0,0,0,0,0,0,0],
@@ -23,7 +25,61 @@ let playfield = [
     [0,0,0,0,0,0,0,0,0,0],
 ];
 
-let gameSpeed = 400;
+let score = 0;
+let currentLevel = 1;
+let possibleLevels = {
+   1: {
+       scorePerLine: 700,
+       speed: 400,
+       nextLevelScore: 100000
+   },
+    2: {
+        scorePerLine: 700,
+        speed: 350,
+        nextLevelScore: 200000
+    },
+    3: {
+        scorePerLine: 700,
+        speed: 300,
+        nextLevelScore: 300000
+    },
+    4: {
+        scorePerLine: 700,
+        speed: 250,
+        nextLevelScore: 400000
+    },
+    5: {
+        scorePerLine: 700,
+        speed: 200,
+        nextLevelScore: 500000
+    },
+    6: {
+        scorePerLine: 700,
+        speed: 150,
+        nextLevelScore: 600000
+    },
+    7: {
+        scorePerLine: 700,
+        speed: 120,
+        nextLevelScore: 700000
+    },
+    8: {
+        scorePerLine: 700,
+        speed: 100,
+        nextLevelScore: 800000
+    },
+    9: {
+        scorePerLine: 700,
+        speed: 80,
+        nextLevelScore: 900000
+    },
+    10: {
+        scorePerLine: 700,
+        speed: 50,
+        nextLevelScore: Infinity,
+    },
+};
+
 let activeTetro = {
     x: 0,
     y: 0,
@@ -71,6 +127,8 @@ T: [
     [0,0,0]
 ],
 };
+
+
 
 function draw () {
     let mainInnerHTML = "";
@@ -138,7 +196,8 @@ function hasCollisions() {
 }
 
 function removeFullLines () {
-    let canRemoveLine = true;
+    let canRemoveLine = true,
+        filledLines = 0;
     for (let y = 0; y < playfield.length; y++) {
         for (let x = 0; x < playfield[y].length; x++) {
             if (playfield[y][x] !== 2) {
@@ -149,9 +208,31 @@ function removeFullLines () {
         if (canRemoveLine) {
             playfield.splice(y, 1);
             playfield.splice(0, 0, [0,0,0,0,0,0,0,0,0,0]);
+            filledLines +=1;
         }
         canRemoveLine = true;
     }
+    switch (filledLines) {
+        case 1:
+            score += 700;
+            break;
+        case 2:
+            score += 1200;
+            break;
+        case 3:
+            score += 2300;
+            break;
+        case 4:
+            score += 24000;
+            break;
+    }
+    scroeElem.innerHTML = score;
+
+    if (score >= possibleLevels[currentLevel].nextLevelScore) {
+        currentLevel++;
+        levelElem.innerHTML = currentLevel;
+    }
+
 }
 
 function getNewTetro() {
@@ -175,6 +256,7 @@ function moveTetroDown() {
     if (hasCollisions()) {
         activeTetro.y -= 1;
         fixTetro();
+        removeFullLines();
         activeTetro.shape = getNewTetro();
         activeTetro.x =Math.floor((10 - activeTetro.shape[0].length)/2);
         activeTetro.y = 0;
@@ -200,6 +282,10 @@ document.onkeydown = function (e) {
     addActiveTetro();
     draw();
 };
+
+scroeElem.innerHTML = score;
+levelElem.innerHTML = currentLevel;
+
 addActiveTetro();
 draw();
 
@@ -207,8 +293,8 @@ function startGame() {
     moveTetroDown();
     addActiveTetro();
     draw();
-    setTimeout(startGame, gameSpeed);
+    setTimeout(startGame, possibleLevels[currentLevel].speed);
 }
 
-setTimeout(startGame, gameSpeed);
+setTimeout(startGame, possibleLevels[currentLevel].speed);
 
