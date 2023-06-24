@@ -1,6 +1,7 @@
 let main = document.querySelector(".main");
 const scroeElem = document.getElementById("score");
 const levelElem = document.getElementById("level");
+const nextTetroElem = document.getElementById("next-tetro");
 
 let playfield = [
     [0,0,0,0,0,0,0,0,0,0],
@@ -80,55 +81,46 @@ let possibleLevels = {
     },
 };
 
-let activeTetro = {
-    x: 0,
-    y: 0,
-    shape: [
+let figures = {
+    O: [
+        [1,1],
+        [1,1]
+    ],
+    I: [
+        [0,1,0,0],
+        [0,1,0,0],
+        [0,1,0,0],
+        [0,1,0,0]
+    ],
+    S: [
+        [0,1,1],
+        [1,1,0],
+        [0,0,0]
+    ],
+    Z: [
+        [1,1,0],
+        [0,1,1],
+        [0,0,0]
+    ],
+    L:  [
+        [1,0,0],
+        [1,1,1],
+        [0,0,0]
+    ],
+    J: [
+        [0,0,1],
+        [1,1,1],
+        [0,0,0]
+    ],
+    T: [
         [1,1,1],
         [0,1,0],
-        [0,0,0],
+        [0,0,0]
     ],
 };
 
-let figures = {
-O: [
-    [1,1],
-    [1,1]
-],
-I: [
-    [0,1,0,0],
-    [0,1,0,0],
-    [0,1,0,0],
-    [0,1,0,0]
-],
-S: [
-    [0,1,1],
-    [1,1,0],
-    [0,0,0]
-],
-Z: [
-    [1,1,0],
-    [0,1,1],
-    [0,0,0]
-],
-L:  [
-    [1,0,0],
-    [1,1,1],
-    [0,0,0]
-],
-J: [
-    [0,0,1],
-    [1,1,1],
-    [0,0,0]
-],
-T: [
-    [1,1,1],
-    [0,1,0],
-    [0,0,0]
-],
-};
-
-
+let activeTetro = getNewTetro();
+let nextTetro = getNewTetro();
 
 function draw () {
     let mainInnerHTML = "";
@@ -144,6 +136,20 @@ function draw () {
         }
     }
     main.innerHTML = mainInnerHTML;
+}
+
+function drawNextTetro() {
+    let nextTetroInnerHTML = "";
+    for (let y = 0; y < nextTetro.shape.length; y++) {
+        for (let x = 0; x < nextTetro.shape[y].length; x++) {
+            if (nextTetro.shape [y] [x]) {
+                nextTetroInnerHTML = '<div class="cell movingCell"></div>';
+            } else {
+                mainInnerHTML += '<div class="cell"></div>';
+            }
+        }
+    }
+    nextTetroElem.innerHTML = nextTetroInnerHTML;
 }
 
 function removePrevActiveTetro() {
@@ -238,7 +244,13 @@ function removeFullLines () {
 function getNewTetro() {
     const possibleFigures = 'IOJLTSZ';
    const rand = Math.floor(Math.random()*7);
-   return figures[possibleFigures[rand]];
+   const newTetro = figures[possibleFigures[rand]];
+return {
+    x: Math.floor((10 - newTetro[0].length)/2),
+    y: 0,
+    shape: newTetro,
+
+   };
 }
 
 function fixTetro() {
@@ -257,9 +269,17 @@ function moveTetroDown() {
         activeTetro.y -= 1;
         fixTetro();
         removeFullLines();
-        activeTetro.shape = getNewTetro();
-        activeTetro.x =Math.floor((10 - activeTetro.shape[0].length)/2);
-        activeTetro.y = 0;
+        activeTetro = getNewTetro();
+    }
+}
+
+function dropTetro() {
+    for (let y = activeTetro.y; y < playfield.length; y++) {
+        activeTetro.y += 1;
+        if (hasCollisions()) {
+            activeTetro.y -= 1;
+            break;
+        }
     }
 }
 
@@ -276,9 +296,12 @@ document.onkeydown = function (e) {
         }
     } else if (e.keyCode === 40) {
         moveTetroDown();
-    } else if (e.keyCode === 38) {
+    } else if (e.keyCode === 90) {
         rotateTetro();
-        }
+        } else if(e.keyCode === 32) {
+        dropTetro();
+    };
+
     addActiveTetro();
     draw();
 };
@@ -288,6 +311,7 @@ levelElem.innerHTML = currentLevel;
 
 addActiveTetro();
 draw();
+drawNextTetro();
 
 function startGame() {
     moveTetroDown();
