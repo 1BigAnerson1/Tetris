@@ -385,5 +385,3 @@ function startGame() {
         gameTimerID = setTimeout(startGame, possibleLevels[currentLevel].speed);
     }
 }
-
-
